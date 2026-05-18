@@ -238,3 +238,66 @@ describe('useStore - generateDailyTasks', () => {
     expect(store.state.taskRecords).toHaveLength(1)
   })
 })
+
+describe('useStore - rewards & redemption', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    resetStore()
+  })
+
+  it('addReward 添加奖励', () => {
+    const store = useStore()
+    store.addReward({ title: '看30分钟电视', pointsCost: 20, category: '屏幕时间' })
+    expect(store.state.rewards).toHaveLength(1)
+    expect(store.state.rewards[0].title).toBe('看30分钟电视')
+    expect(store.state.rewards[0].pointsCost).toBe(20)
+    expect(store.state.rewards[0].isActive).toBe(true)
+  })
+
+  it('updateReward 更新奖励', () => {
+    const store = useStore()
+    store.addReward({ title: '看电视', pointsCost: 20 })
+    const id = store.state.rewards[0].id
+    store.updateReward(id, { title: '看1小时电视', pointsCost: 30 })
+    expect(store.state.rewards[0].title).toBe('看1小时电视')
+    expect(store.state.rewards[0].pointsCost).toBe(30)
+  })
+
+  it('deleteReward 删除奖励', () => {
+    const store = useStore()
+    store.addReward({ title: '看电视', pointsCost: 20 })
+    store.addReward({ title: '买玩具', pointsCost: 50 })
+    store.deleteReward(store.state.rewards[0].id)
+    expect(store.state.rewards).toHaveLength(1)
+  })
+
+  it('redeemReward 积分足够时成功兑换', () => {
+    const store = useStore()
+    store.state.taskRecords = [
+      { id: 'tr1', taskId: 't1', title: '刷牙', points: 30, date: '2026-05-18', status: 'approved' }
+    ]
+    store.state.rewards = [
+      { id: 'rw1', title: '看电视', pointsCost: 20, isActive: true }
+    ]
+    const result = store.redeemReward('rw1')
+    expect(result).toBe(true)
+    expect(store.state.redemptions).toHaveLength(1)
+    expect(store.state.redemptions[0].rewardTitle).toBe('看电视')
+    expect(store.state.redemptions[0].pointsSpent).toBe(20)
+  })
+
+  it('redeemReward 积分不够返回 false', () => {
+    const store = useStore()
+    store.state.rewards = [
+      { id: 'rw1', title: '买玩具', pointsCost: 50, isActive: true }
+    ]
+    const result = store.redeemReward('rw1')
+    expect(result).toBe(false)
+    expect(store.state.redemptions).toHaveLength(0)
+  })
+
+  it('redeemReward 奖励不存在不报错', () => {
+    const store = useStore()
+    expect(() => store.redeemReward('nonexistent')).not.toThrow()
+  })
+})

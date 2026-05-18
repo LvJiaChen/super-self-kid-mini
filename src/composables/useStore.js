@@ -183,6 +183,44 @@ export function useStore() {
     state.lastDate = today
   }
 
+  function addReward(rewardData) {
+    const reward = {
+      id: generateId(),
+      title: rewardData.title,
+      description: rewardData.description || '',
+      pointsCost: rewardData.pointsCost || 0,
+      category: rewardData.category || '',
+      isActive: true
+    }
+    state.rewards.push(reward)
+  }
+
+  function updateReward(id, updates) {
+    const idx = state.rewards.findIndex(r => r.id === id)
+    if (idx === -1) return
+    Object.assign(state.rewards[idx], updates)
+  }
+
+  function deleteReward(id) {
+    const idx = state.rewards.findIndex(r => r.id === id)
+    if (idx !== -1) state.rewards.splice(idx, 1)
+  }
+
+  function redeemReward(rewardId) {
+    const reward = state.rewards.find(r => r.id === rewardId)
+    if (!reward || !reward.isActive) return false
+    if (kidPoints.value < reward.pointsCost) return false
+    state.redemptions.push({
+      id: generateId(),
+      rewardId: reward.id,
+      rewardTitle: reward.title,
+      pointsSpent: reward.pointsCost,
+      redeemedAt: Date.now(),
+      status: 'completed'
+    })
+    return true
+  }
+
   instance = {
     state,
     get kidPoints() { return kidPoints.value },
@@ -197,10 +235,10 @@ export function useStore() {
     approveTask,
     rejectTask,
     generateDailyTasks,
-    addReward: null,
-    updateReward: null,
-    deleteReward: null,
-    redeemReward: null,
+    addReward,
+    updateReward,
+    deleteReward,
+    redeemReward,
     exportData: null,
     importData: null
   }
