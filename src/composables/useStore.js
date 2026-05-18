@@ -140,6 +140,49 @@ export function useStore() {
     }
   }
 
+  function generateDailyTasks() {
+    const today = new Date().toISOString().split('T')[0]
+    if (state.lastDate === today) return
+
+    // Daily tasks: generate one record per active daily task for today
+    const dailyTasks = state.tasks.filter(t => t.type === 'daily' && t.isActive)
+    dailyTasks.forEach(task => {
+      const exists = state.taskRecords.some(r => r.taskId === task.id && r.date === today)
+      if (!exists) {
+        state.taskRecords.push({
+          id: generateId(),
+          taskId: task.id,
+          title: task.title,
+          points: task.points,
+          date: today,
+          status: 'pending',
+          submittedAt: null,
+          approvedAt: null
+        })
+      }
+    })
+
+    // One-time tasks: generate one record only (check across all dates)
+    const oneTimeTasks = state.tasks.filter(t => t.type === 'one-time' && t.isActive)
+    oneTimeTasks.forEach(task => {
+      const exists = state.taskRecords.some(r => r.taskId === task.id)
+      if (!exists) {
+        state.taskRecords.push({
+          id: generateId(),
+          taskId: task.id,
+          title: task.title,
+          points: task.points,
+          date: today,
+          status: 'pending',
+          submittedAt: null,
+          approvedAt: null
+        })
+      }
+    })
+
+    state.lastDate = today
+  }
+
   instance = {
     state,
     get kidPoints() { return kidPoints.value },
@@ -153,7 +196,7 @@ export function useStore() {
     submitTask,
     approveTask,
     rejectTask,
-    generateDailyTasks: null,
+    generateDailyTasks,
     addReward: null,
     updateReward: null,
     deleteReward: null,

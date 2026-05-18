@@ -181,3 +181,60 @@ describe('useStore - task submission & review', () => {
     expect(store.state.taskRecords[0].submittedAt).toBeNull()
   })
 })
+
+describe('useStore - generateDailyTasks', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    resetStore()
+  })
+
+  it('首次运行生成当天任务记录', () => {
+    const store = useStore()
+    store.state.tasks = [
+      { id: 't1', title: '刷牙', points: 5, type: 'daily', isActive: true },
+      { id: 't2', title: '作业', points: 10, type: 'daily', isActive: true }
+    ]
+    store.state.lastDate = ''
+    store.generateDailyTasks()
+    const today = new Date().toISOString().split('T')[0]
+    expect(store.state.taskRecords).toHaveLength(2)
+    expect(store.state.taskRecords.every(r => r.date === today)).toBe(true)
+    expect(store.state.taskRecords.every(r => r.status === 'pending')).toBe(true)
+    expect(store.state.lastDate).toBe(today)
+  })
+
+  it('同日不重复生成', () => {
+    const store = useStore()
+    const today = new Date().toISOString().split('T')[0]
+    store.state.tasks = [
+      { id: 't1', title: '刷牙', points: 5, type: 'daily', isActive: true }
+    ]
+    store.state.lastDate = today
+    store.generateDailyTasks()
+    expect(store.state.taskRecords).toHaveLength(0)
+  })
+
+  it('不活跃任务不生成', () => {
+    const store = useStore()
+    store.state.tasks = [
+      { id: 't1', title: '刷牙', points: 5, type: 'daily', isActive: false }
+    ]
+    store.state.lastDate = ''
+    store.generateDailyTasks()
+    expect(store.state.taskRecords).toHaveLength(0)
+  })
+
+  it('一次任务生成一个实例', () => {
+    const store = useStore()
+    store.state.tasks = [
+      { id: 't1', title: '帮奶奶搬东西', points: 20, type: 'one-time', isActive: true }
+    ]
+    store.state.lastDate = ''
+    store.generateDailyTasks()
+    expect(store.state.taskRecords).toHaveLength(1)
+    // 再次生成不重复
+    store.state.lastDate = ''
+    store.generateDailyTasks()
+    expect(store.state.taskRecords).toHaveLength(1)
+  })
+})
