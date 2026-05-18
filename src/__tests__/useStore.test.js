@@ -126,3 +126,58 @@ describe('useStore - task CRUD', () => {
     expect(store.state.tasks[0].title).toBe('作业')
   })
 })
+
+describe('useStore - task submission & review', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    resetStore()
+  })
+
+  it('submitTask 将 pending 状态改为 submitted', () => {
+    const store = useStore()
+    store.state.taskRecords = [
+      { id: 'tr1', taskId: 't1', title: '刷牙', points: 5, date: '2026-05-18', status: 'pending', submittedAt: null, approvedAt: null }
+    ]
+    store.submitTask('tr1')
+    expect(store.state.taskRecords[0].status).toBe('submitted')
+    expect(store.state.taskRecords[0].submittedAt).toBeTruthy()
+  })
+
+  it('submitTask 非 pending 状态不生效', () => {
+    const store = useStore()
+    store.state.taskRecords = [
+      { id: 'tr1', taskId: 't1', title: '刷牙', points: 5, date: '2026-05-18', status: 'approved', submittedAt: null, approvedAt: null }
+    ]
+    store.submitTask('tr1')
+    expect(store.state.taskRecords[0].status).toBe('approved')
+  })
+
+  it('approveTask 将 submitted 状态改为 approved', () => {
+    const store = useStore()
+    store.state.taskRecords = [
+      { id: 'tr1', taskId: 't1', title: '刷牙', points: 5, date: '2026-05-18', status: 'submitted', submittedAt: Date.now(), approvedAt: null }
+    ]
+    store.approveTask('tr1')
+    expect(store.state.taskRecords[0].status).toBe('approved')
+    expect(store.state.taskRecords[0].approvedAt).toBeTruthy()
+  })
+
+  it('approveTask 非 submitted 状态不生效', () => {
+    const store = useStore()
+    store.state.taskRecords = [
+      { id: 'tr1', taskId: 't1', title: '刷牙', points: 5, date: '2026-05-18', status: 'pending', submittedAt: null, approvedAt: null }
+    ]
+    store.approveTask('tr1')
+    expect(store.state.taskRecords[0].status).toBe('pending')
+  })
+
+  it('rejectTask 将 submitted 状态退回 pending', () => {
+    const store = useStore()
+    store.state.taskRecords = [
+      { id: 'tr1', taskId: 't1', title: '刷牙', points: 5, date: '2026-05-18', status: 'submitted', submittedAt: Date.now(), approvedAt: null }
+    ]
+    store.rejectTask('tr1')
+    expect(store.state.taskRecords[0].status).toBe('pending')
+    expect(store.state.taskRecords[0].submittedAt).toBeNull()
+  })
+})

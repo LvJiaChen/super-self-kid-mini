@@ -116,6 +116,30 @@ export function useStore() {
     if (idx !== -1) state.tasks.splice(idx, 1)
   }
 
+  function submitTask(recordId) {
+    const record = state.taskRecords.find(r => r.id === recordId)
+    if (record && record.status === 'pending') {
+      record.status = 'submitted'
+      record.submittedAt = Date.now()
+    }
+  }
+
+  function approveTask(recordId) {
+    const record = state.taskRecords.find(r => r.id === recordId)
+    if (record && record.status === 'submitted') {
+      record.status = 'approved'
+      record.approvedAt = Date.now()
+    }
+  }
+
+  function rejectTask(recordId) {
+    const record = state.taskRecords.find(r => r.id === recordId)
+    if (record && record.status === 'submitted') {
+      record.status = 'pending'
+      record.submittedAt = null
+    }
+  }
+
   instance = {
     state,
     get kidPoints() { return kidPoints.value },
@@ -126,9 +150,9 @@ export function useStore() {
     addTask,
     updateTask,
     deleteTask,
-    submitTask: null,
-    approveTask: null,
-    rejectTask: null,
+    submitTask,
+    approveTask,
+    rejectTask,
     generateDailyTasks: null,
     addReward: null,
     updateReward: null,
