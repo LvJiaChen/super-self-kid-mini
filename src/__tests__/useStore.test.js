@@ -46,6 +46,16 @@ describe('useStore - settings', () => {
     expect(store.verifyPIN('111111')).toBe(true)
   })
 
+  it('isParentMode 持久化到 localStorage', () => {
+    const store = useStore()
+    store.state.isParentMode = true
+    store.saveToStorage()
+
+    resetStore()
+    const store2 = useStore()
+    expect(store2.state.isParentMode).toBe(true)
+  })
+
   it('kidPoints 正确计算', () => {
     const store = useStore()
     store.state.taskRecords = [

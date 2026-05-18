@@ -47,6 +47,7 @@ export function useStore() {
     if (!raw) return
     try {
       const data = JSON.parse(raw)
+      state.isParentMode = data.isParentMode || false
       Object.assign(state.settings, data.settings || {})
       state.tasks = data.tasks || []
       state.taskRecords = data.taskRecords || []
@@ -58,10 +59,9 @@ export function useStore() {
     }
   }
 
-  let _saving = false
   function saveToStorage() {
-    if (_saving) return
     const data = {
+      isParentMode: state.isParentMode,
       settings: { ...state.settings },
       tasks: [...state.tasks],
       taskRecords: [...state.taskRecords],
