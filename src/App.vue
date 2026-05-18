@@ -4,7 +4,7 @@
       <KidView />
     </template>
     <template #parent>
-      <div class="placeholder">👩 家长模式（即将实现）</div>
+      <ParentView />
     </template>
   </ModeGate>
 </template>
@@ -12,6 +12,8 @@
 <script setup>
 import ModeGate from './components/ModeGate.vue'
 import KidView from './components/KidView.vue'
+import ParentView from './components/ParentView.vue'
 import { useStore } from './composables/useStore.js'
+
 useStore().generateDailyTasks()
 </script>
