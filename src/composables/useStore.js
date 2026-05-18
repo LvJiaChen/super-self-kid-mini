@@ -91,6 +91,31 @@ export function useStore() {
   )
   setTimeout(() => { _watchReady = true }, 0)
 
+  function addTask(taskData) {
+    const task = {
+      id: generateId(),
+      title: taskData.title,
+      description: taskData.description || '',
+      points: taskData.points || 0,
+      type: taskData.type || 'daily',
+      category: taskData.category || '',
+      isActive: true,
+      createdAt: Date.now()
+    }
+    state.tasks.push(task)
+  }
+
+  function updateTask(id, updates) {
+    const idx = state.tasks.findIndex(t => t.id === id)
+    if (idx === -1) return
+    Object.assign(state.tasks[idx], updates)
+  }
+
+  function deleteTask(id) {
+    const idx = state.tasks.findIndex(t => t.id === id)
+    if (idx !== -1) state.tasks.splice(idx, 1)
+  }
+
   instance = {
     state,
     get kidPoints() { return kidPoints.value },
@@ -98,9 +123,9 @@ export function useStore() {
     generateId,
     loadFromStorage,
     saveToStorage,
-    addTask: null,
-    updateTask: null,
-    deleteTask: null,
+    addTask,
+    updateTask,
+    deleteTask,
     submitTask: null,
     approveTask: null,
     rejectTask: null,
