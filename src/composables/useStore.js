@@ -142,7 +142,6 @@ export function useStore() {
 
   function generateDailyTasks() {
     const today = new Date().toISOString().split('T')[0]
-    if (state.lastDate === today) return
 
     // Daily tasks: generate one record per active daily task for today
     const dailyTasks = state.tasks.filter(t => t.type === 'daily' && t.isActive)

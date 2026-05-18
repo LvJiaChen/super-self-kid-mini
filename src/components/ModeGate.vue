@@ -66,6 +66,7 @@ function cancel() {
 
 function exitParent() {
   store.state.isParentMode = false
+  store.generateDailyTasks()
 }
 </script>
 

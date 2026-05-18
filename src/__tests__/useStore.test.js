@@ -203,15 +203,19 @@ describe('useStore - generateDailyTasks', () => {
     expect(store.state.lastDate).toBe(today)
   })
 
-  it('同日不重复生成', () => {
+  it('同日多次调用不重复生成', () => {
     const store = useStore()
     const today = new Date().toISOString().split('T')[0]
     store.state.tasks = [
       { id: 't1', title: '刷牙', points: 5, type: 'daily', isActive: true }
     ]
     store.state.lastDate = today
+    // First call generates record
     store.generateDailyTasks()
-    expect(store.state.taskRecords).toHaveLength(0)
+    expect(store.state.taskRecords).toHaveLength(1)
+    // Second call on same day does not duplicate
+    store.generateDailyTasks()
+    expect(store.state.taskRecords).toHaveLength(1)
   })
 
   it('不活跃任务不生成', () => {
