@@ -1,15 +1,16 @@
 <template>
-  <div class="app">
-    <h1>超级自律小超人</h1>
-  </div>
+  <ModeGate>
+    <template #kid>
+      <div class="placeholder">👦 孩子模式（即将实现）</div>
+    </template>
+    <template #parent>
+      <div class="placeholder">👩 家长模式（即将实现）</div>
+    </template>
+  </ModeGate>
 </template>
 
 <script setup>
+import ModeGate from './components/ModeGate.vue'
+import { useStore } from './composables/useStore.js'
+useStore().generateDailyTasks()
 </script>
-
-<style scoped>
-.app {
-  text-align: center;
-  padding: 20px;
-}
-</style>
