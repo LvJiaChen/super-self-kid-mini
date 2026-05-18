@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/super-self-kid-mini/',
   plugins: [
     vue(),
     VitePWA({
@@ -16,7 +17,7 @@ export default defineConfig({
         background_color: '#fff8e7',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: '/super-self-kid-mini/',
         icons: [
           {
             src: 'pwa-192x192.png',
