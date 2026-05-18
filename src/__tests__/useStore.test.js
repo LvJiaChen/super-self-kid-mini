@@ -301,3 +301,41 @@ describe('useStore - rewards & redemption', () => {
     expect(() => store.redeemReward('nonexistent')).not.toThrow()
   })
 })
+
+describe('useStore - export/import', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    resetStore()
+  })
+
+  it('exportData 导出 JSON 字符串', () => {
+    const store = useStore()
+    store.state.settings.kidName = '小明'
+    store.addTask({ title: '刷牙', points: 5, type: 'daily' })
+    const json = store.exportData()
+    const data = JSON.parse(json)
+    expect(data.settings.kidName).toBe('小明')
+    expect(data.tasks).toHaveLength(1)
+  })
+
+  it('importData 导入并覆盖当前数据', () => {
+    const store = useStore()
+    const importJson = JSON.stringify({
+      settings: { parentPIN: '999999', kidName: '小红', parentName: '妈妈' },
+      tasks: [{ id: 't1', title: '导入任务', points: 10, type: 'daily', isActive: true }],
+      taskRecords: [],
+      rewards: [],
+      redemptions: [],
+      lastDate: '2026-05-18'
+    })
+    store.importData(importJson)
+    expect(store.state.settings.kidName).toBe('小红')
+    expect(store.state.tasks).toHaveLength(1)
+    expect(store.state.tasks[0].title).toBe('导入任务')
+  })
+
+  it('importData 无效 JSON 不报错', () => {
+    const store = useStore()
+    expect(() => store.importData('invalid json')).not.toThrow()
+  })
+})

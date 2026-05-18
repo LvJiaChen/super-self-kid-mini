@@ -221,6 +221,37 @@ export function useStore() {
     return true
   }
 
+  function exportData() {
+    return JSON.stringify({
+      isParentMode: state.isParentMode,
+      settings: { ...state.settings },
+      tasks: [...state.tasks],
+      taskRecords: [...state.taskRecords],
+      rewards: [...state.rewards],
+      redemptions: [...state.redemptions],
+      lastDate: state.lastDate
+    }, null, 2)
+  }
+
+  function importData(jsonStr) {
+    try {
+      const data = JSON.parse(jsonStr)
+      if (!data.settings || !Array.isArray(data.tasks)) {
+        throw new Error('Invalid data structure')
+      }
+      Object.assign(state.settings, data.settings)
+      state.isParentMode = data.isParentMode || false
+      state.tasks = data.tasks || []
+      state.taskRecords = data.taskRecords || []
+      state.rewards = data.rewards || []
+      state.redemptions = data.redemptions || []
+      state.lastDate = data.lastDate || ''
+      saveToStorage()
+    } catch (e) {
+      console.error('Import failed:', e)
+    }
+  }
+
   instance = {
     state,
     get kidPoints() { return kidPoints.value },
@@ -239,8 +270,8 @@ export function useStore() {
     updateReward,
     deleteReward,
     redeemReward,
-    exportData: null,
-    importData: null
+    exportData,
+    importData
   }
   return instance
 }
